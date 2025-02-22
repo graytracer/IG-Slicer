@@ -38,8 +38,9 @@ class StreamlitImageSlicer:
         if 'processed_image' not in st.session_state or st.session_state.processed_image is None:
             st.markdown("""
                 ## Make seemless grids again in 2025(4:5)!✌️
+                [See Main Page](https://github.com/graytracer/IG-Slicer?tab=readme-ov-file#new-instagrid-slicer----2025feb4534)
                 
-                How To [See Main Page](https://github.com/graytracer/IG-Slicer?tab=readme-ov-file#new-instagrid-slicer----2025feb4534):
+                How To :
                 * Upload(in Sidebar) 🖼️  >  Choose grid size 📏  >  Adjust slider ↔️  >  Slice 🔪
                 * Download images as zip / Individually⬇️ 
                 
