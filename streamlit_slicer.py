@@ -39,7 +39,7 @@ class StreamlitImageSlicer:
             st.markdown("""
                 ## Make seemless grids again in 2025(4:5)!✌️
                 
-                How To:
+                How To [See Main Page](https://github.com/graytracer/IG-Slicer?tab=readme-ov-file#new-instagrid-slicer----2025feb4534):
                 * Upload(in Sidebar) 🖼️  >  Choose grid size 📏  >  Adjust slider ↔️  >  Slice 🔪
                 * Download images as zip / Individually⬇️ 
                 
