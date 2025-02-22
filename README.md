@@ -1,4 +1,4 @@
-# New INSTAGRID SLICER(4:5) - (2025/feb)  
+## New 4:5 INSTAGRID SLICER - (2025/feb)  
 <a href="https://ig-slicer.streamlit.app/" target="_blank">
   <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; font-size: 16px;">Slice Now!</button>
 </a>
