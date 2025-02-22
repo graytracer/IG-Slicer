@@ -44,7 +44,7 @@ class StreamlitImageSlicer:
                 * Download images as zip / Individually⬇️ 
                 
                         
-                **⚠️ Upload images at 4:5(Vertical) RATIO on insta(Not 1:1)**
+                **⚠️ Upload the sliced in 4:5 ratio on instagram (Not 1:1)**
 
                 ---
             """)
