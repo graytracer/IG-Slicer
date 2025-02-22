@@ -32,12 +32,12 @@ class StreamlitImageSlicer:
         with st.sidebar:
             uploaded_file = st.file_uploader("Choose an image...", type=['png', 'jpg', 'jpeg'])
             grid_type = st.selectbox("Grid Type:", ["1x3", "2x3", "3x3"])
-            bg_color = st.selectbox("Background Color:", ["black", "white"])
+            bg_color = st.selectbox("Background Color (If Need) :", ["black", "white"])
 
         # Add a welcome message when no image is uploaded
         if 'processed_image' not in st.session_state or st.session_state.processed_image is None:
             st.markdown("""
-                ## Welcome to Image Grid Slicer(2025 - vertical grid)! 👋
+                ## Make seemless grids again in 2025(4:5)!✌️
                 
                 How To:
                 * Upload(in Sidebar) 🖼️  >  Choose grid size 📏  >  Adjust slider ↔️  >  Slice 🔪
