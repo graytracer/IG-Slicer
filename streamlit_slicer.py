@@ -30,7 +30,7 @@ class StreamlitImageSlicer:
         #Image Grid Slicer
         
         with st.sidebar:
-            uploaded_file = st.file_uploader("Choose an image:(suggested.img-width:≥3112px)", type=['png', 'jpg', 'jpeg'])
+            uploaded_file = st.file_uploader("Choose an image: (suggested.img-width:≥3112px)", type=['png', 'jpg', 'jpeg'])
             grid_type = st.selectbox("Grid Type:", ["1x3", "2x3", "3x3"])
             bg_color = st.selectbox("Background Color (If Need) :", ["black", "white"])
 
