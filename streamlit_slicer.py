@@ -13,10 +13,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Create automatic redirect using HTML
+# Create automatic redirect using JavaScript location.replace() which changes the browser URL
 st.markdown(
     """
-    <meta http-equiv="refresh" content="5;url=https://www.igslicer.site" />
     <style>
         .redirect-container {
             text-align: center;
@@ -40,6 +39,17 @@ st.markdown(
             font-size: 1.2em;
             color: #4B9FE1;
             text-decoration: underline;
+            cursor: pointer;
+        }
+        .url-display {
+            font-size: 1.3em;
+            color: #0a5c0a;
+            margin: 15px 0;
+            font-weight: bold;
+            background-color: #e8f4e8;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
         }
         .countdown {
             font-size: 1.2em;
@@ -50,10 +60,17 @@ st.markdown(
     <div class="redirect-container">
         <div class="redirect-title">IG-Slicer Has Moved!</div>
         <div class="redirect-message">We've launched a brand new web app with improved features.</div>
-        <a href="https://www.igslicer.site" class="redirect-link">Visit www.igslicer.site now</a>
+        <div class="url-display">www.igslicer.site</div>
+        <div><a href="https://www.igslicer.site" class="redirect-link" onclick="redirectNow(); return false;">Go there now</a></div>
         <div class="countdown">Redirecting automatically in 5 seconds...</div>
     </div>
     <script>
+        // Function to redirect immediately
+        function redirectNow() {
+            window.location.replace('https://www.igslicer.site');
+        }
+        
+        // Countdown and auto-redirect
         var seconds = 5;
         function countdown() {
             var countdown = document.querySelector('.countdown');
@@ -63,6 +80,7 @@ st.markdown(
                 setTimeout(countdown, 1000);
             } else {
                 countdown.innerHTML = 'Redirecting now...';
+                redirectNow();
             }
         }
         setTimeout(countdown, 1000);
