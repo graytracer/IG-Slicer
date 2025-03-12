@@ -1,60 +1,74 @@
 import streamlit as st
-import time
-import streamlit.components.v1 as components
 
-# Configure the page
-st.set_page_config(
-    page_title="IG-Slicer - Redirecting...",
-    layout="centered"
-)
-
-# Custom HTML with meta refresh and JavaScript redirect
-html_content = """
-    <html>
-        <head>
-            <meta http-equiv="refresh" content="4;url=https://www.igslicer.site" />
-            <style>
-                .redirect-container {
-                    text-align: center;
-                    padding: 40px;
-                    font-family: sans-serif;
-                }
-                .redirect-message {
-                    font-size: 24px;
-                    margin-bottom: 20px;
-                }
-                .new-url {
-                    color: #FF4B4B;
-                    font-size: 20px;
-                    text-decoration: none;
-                }
-                .countdown {
-                    font-size: 18px;
-                    margin-top: 20px;
-                    color: #666;
-                }
-            </style>
+class RedirectApp:
+    def __init__(self):
+        # Set page config
+        st.set_page_config(
+            page_title="IG-Slicer - Redirecting",
+            layout="centered",
+        )
+        
+    def create_ui(self):
+        st.title("IG-Slicer has moved!")
+        
+        # Display message about the new website
+        st.markdown("""
+        ## We've moved to a new home!
+        
+        **Our new website is now available at:**
+        
+        ## [www.igslicer.site](https://www.igslicer.site)
+        
+        You will be automatically redirected in 4 seconds...
+        """)
+        
+        # Create a redirect with JavaScript after 4 seconds
+        redirect_html = """
+        <script type="text/javascript">
+            // Function to redirect after 4 seconds
+            function redirect() {
+                window.location.href = "https://www.igslicer.site";
+            }
+            
+            // Set timeout for 4 seconds
+            setTimeout(redirect, 4000);
+        </script>
+        """
+        
+        # Inject the HTML/JS for redirect
+        st.markdown(redirect_html, unsafe_allow_html=True)
+        
+        # Add a manual redirect button for users who have JavaScript disabled
+        st.markdown("---")
+        st.markdown("If you are not redirected automatically, please click the button below:")
+        
+        # Use a button with custom styling to make it prominent
+        button_style = """
+        <style>
+        div.stButton > button {
+            background-color: #FF4B4B;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        </style>
+        """
+        st.markdown(button_style, unsafe_allow_html=True)
+        
+        if st.button("Go to www.igslicer.site now"):
+            js = f"""
             <script>
-                setTimeout(function() {
-                    window.location.href = 'https://www.igslicer.site';
-                }, 4000);
+                window.location.href = "https://www.igslicer.site";
             </script>
-        </head>
-        <body>
-            <div class="redirect-container">
-                <div class="redirect-message">
-                    IG-Slicer has moved to a new home!
-                </div>
-                <a href="https://www.igslicer.site" class="new-url">
-                    www.igslicer.site
-                </a>
-                <div class="countdown">
-                    Redirecting in 4 seconds...
-                </div>
-            </div>
-        </body>
-    </html>
-"""
+            """
+            st.markdown(js, unsafe_allow_html=True)
 
-# Render the HTML
-components.html(html_content, height=300) 
+if __name__ == "__main__":
+    app = RedirectApp()
+    app.create_ui() 
