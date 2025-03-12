@@ -1,4 +1,6 @@
 import streamlit as st
+import streamlit.components.v1 as components
+import time
 
 class RedirectApp:
     def __init__(self):
@@ -7,6 +9,10 @@ class RedirectApp:
             page_title="IG-Slicer - Redirecting",
             layout="centered",
         )
+        
+        # Initialize session state for tracking redirect status
+        if 'redirect_triggered' not in st.session_state:
+            st.session_state.redirect_triggered = False
         
     def create_ui(self):
         st.title("IG-Slicer has moved!")
@@ -22,28 +28,30 @@ class RedirectApp:
         You will be automatically redirected in 4 seconds...
         """)
         
-        # Create a redirect with JavaScript after 4 seconds
+        # Use Streamlit components to inject pure HTML with JavaScript
+        # This is more reliable than using st.markdown with unsafe_allow_html
         redirect_html = """
-        <script type="text/javascript">
-            // Function to redirect after 4 seconds
-            function redirect() {
-                window.location.href = "https://www.igslicer.site";
-            }
-            
-            // Set timeout for 4 seconds
-            setTimeout(redirect, 4000);
-        </script>
+        <html>
+        <head>
+            <script>
+                setTimeout(function() {
+                    window.top.location.href = 'https://www.igslicer.site';
+                }, 4000);
+            </script>
+        </head>
+        <body></body>
+        </html>
         """
         
-        # Inject the HTML/JS for redirect
-        st.markdown(redirect_html, unsafe_allow_html=True)
+        # Insert the HTML/JS component
+        components.html(redirect_html, height=0)
         
-        # Add a manual redirect button for users who have JavaScript disabled
+        # Add a manual redirect button 
         st.markdown("---")
         st.markdown("If you are not redirected automatically, please click the button below:")
         
         # Use a button with custom styling to make it prominent
-        button_style = """
+        st.markdown("""
         <style>
         div.stButton > button {
             background-color: #FF4B4B;
@@ -58,16 +66,33 @@ class RedirectApp:
             margin-top: 20px;
         }
         </style>
-        """
-        st.markdown(button_style, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
         
+        # Alternative approach for button: when clicked, use iframe to redirect
         if st.button("Go to www.igslicer.site now"):
-            js = f"""
-            <script>
-                window.location.href = "https://www.igslicer.site";
-            </script>
+            # Set redirect flag in session state
+            st.session_state.redirect_triggered = True
+            st.rerun()
+        
+        # If redirect was triggered by button click, show an iframe that handles the redirect
+        if st.session_state.redirect_triggered:
+            redirect_component = """
+            <html>
+            <head>
+                <script>
+                    window.top.location.href = 'https://www.igslicer.site';
+                </script>
+            </head>
+            <body>
+                <p>Redirecting...</p>
+            </body>
+            </html>
             """
-            st.markdown(js, unsafe_allow_html=True)
+            components.html(redirect_component, height=0)
+            
+            # Fallback message if JavaScript is disabled
+            st.markdown("### Redirecting to [www.igslicer.site](https://www.igslicer.site)...")
+            st.markdown("If you are not redirected, please [click here](https://www.igslicer.site) to visit the new website.")
 
 if __name__ == "__main__":
     app = RedirectApp()
