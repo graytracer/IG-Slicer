@@ -7,7 +7,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Create JavaScript-based redirect that updates URL in browser history
+# Use direct JavaScript redirection with window.location to force the redirect
 st.markdown(
     """
     <style>
@@ -23,6 +23,7 @@ st.markdown(
             font-size: 2.5em;
             margin-bottom: 20px;
             color: #262730;
+            font-weight: bold;  /* Make header bold */
         }
         .redirect-message {
             font-size: 1.5em;
@@ -54,36 +55,47 @@ st.markdown(
         <a href="https://www.igslicer.site" class="redirect-link" id="redirect-link">Visit www.igslicer.site now</a>
         <div class="countdown">Redirecting automatically in <span id="countdown">5</span> seconds...</div>
     </div>
+
     <script>
-        // More reliable window.location.replace method
-        var seconds = 5;
-        var targetUrl = "https://www.igslicer.site";
-        
-        function countdown() {
-            var countdownElement = document.getElementById('countdown');
-            seconds--;
-            countdownElement.textContent = seconds;
+        // Immediate execution with direct window.location approach
+        (function() {
+            const targetUrl = "https://www.igslicer.site";
+            let seconds = 5;
             
-            if (seconds <= 0) {
-                // This method replaces the current URL in browser history
-                window.location.replace(targetUrl);
-            } else {
-                setTimeout(countdown, 1000);
-            }
-        }
-        
-        // Start countdown
-        setTimeout(countdown, 1000);
-        
-        // Also handle click on redirect link
-        document.getElementById('redirect-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.replace(targetUrl);
-        });
+            // Force redirect after 5 seconds (bypass any potential restrictions)
+            setTimeout(function() {
+                window.location.href = targetUrl;
+            }, 5000);
+            
+            // Update countdown display
+            const interval = setInterval(function() {
+                seconds--;
+                document.getElementById('countdown').textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+            
+            // Make link also use direct navigation
+            document.getElementById('redirect-link').onclick = function(e) {
+                e.preventDefault();
+                window.location.href = targetUrl;
+                return false;
+            };
+        })();
     </script>
     """, 
     unsafe_allow_html=True
 )
+
+# Add a fallback link in case JavaScript is disabled
+st.markdown("""
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=https://www.igslicer.site" />
+        <p>JavaScript is disabled. Click <a href="https://www.igslicer.site">here</a> to be redirected.</p>
+    </noscript>
+""", unsafe_allow_html=True)
 
 # Prevent any other UI elements from showing
 st.stop()
