@@ -1,99 +1,101 @@
 import streamlit as st
-import streamlit.components.v1 as components
-import time
 
-class RedirectApp:
-    def __init__(self):
-        # Set page config
-        st.set_page_config(
-            page_title="IG-Slicer - Redirecting",
-            layout="centered",
-        )
-        
-        # Initialize session state for tracking redirect status
-        if 'redirect_triggered' not in st.session_state:
-            st.session_state.redirect_triggered = False
-        
-    def create_ui(self):
-        st.title("IG-Slicer has moved!")
-        
-        # Display message about the new website
-        st.markdown("""
-        ## We've moved to a new home!
-        
-        **Our new website is now available at:**
-        
-        ## [www.igslicer.site](https://www.igslicer.site)
-        
-        You will be automatically redirected in 4 seconds...
-        """)
-        
-        # Use Streamlit components to inject pure HTML with JavaScript
-        # This is more reliable than using st.markdown with unsafe_allow_html
-        redirect_html = """
-        <html>
-        <head>
-            <script>
-                setTimeout(function() {
-                    window.top.location.href = 'https://www.igslicer.site';
-                }, 4000);
-            </script>
-        </head>
-        <body></body>
-        </html>
-        """
-        
-        # Insert the HTML/JS component
-        components.html(redirect_html, height=0)
-        
-        # Add a manual redirect button 
-        st.markdown("---")
-        st.markdown("If you are not redirected automatically, please click the button below:")
-        
-        # Use a button with custom styling to make it prominent
-        st.markdown("""
-        <style>
-        div.stButton > button {
-            background-color: #FF4B4B;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            padding: 15px 30px;
+# Set page config immediately
+st.set_page_config(
+    page_title="IG-Slicer - Redirecting",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Use direct JavaScript redirection with window.location to force the redirect
+st.markdown(
+    """
+    <style>
+        .redirect-container {
+            text-align: center;
+            padding: 50px;
+            margin-top: 100px;
+            background-color: #f0f2f6;
             border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        </style>
-        """, unsafe_allow_html=True)
-        
-        # Alternative approach for button: when clicked, use iframe to redirect
-        if st.button("Go to www.igslicer.site now"):
-            # Set redirect flag in session state
-            st.session_state.redirect_triggered = True
-            st.rerun()
-        
-        # If redirect was triggered by button click, show an iframe that handles the redirect
-        if st.session_state.redirect_triggered:
-            redirect_component = """
-            <html>
-            <head>
-                <script>
-                    window.top.location.href = 'https://www.igslicer.site';
-                </script>
-            </head>
-            <body>
-                <p>Redirecting...</p>
-            </body>
-            </html>
-            """
-            components.html(redirect_component, height=0)
-            
-            # Fallback message if JavaScript is disabled
-            st.markdown("### Redirecting to [www.igslicer.site](https://www.igslicer.site)...")
-            st.markdown("If you are not redirected, please [click here](https://www.igslicer.site) to visit the new website.")
+        .redirect-title {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #262730;
+            font-weight: bold;  /* Make header bold */
+        }
+        .redirect-message {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #262730;
+        }
+        .redirect-link {
+            font-size: 1.2em;
+            color: #4B9FE1;
+            text-decoration: underline;
+        }
+        .countdown {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #555;
+        }
+        /* Hide Streamlit elements */
+        #MainMenu, footer, header {
+            visibility: hidden;
+        }
+        .block-container {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    </style>
+    <div class="redirect-container">
+        <div class="redirect-title">IG-Slicer Has Moved!</div>
+        <div class="redirect-message">We've launched a brand new web app with improved features.</div>
+        <a href="https://www.igslicer.site" class="redirect-link" id="redirect-link">Visit www.igslicer.site now</a>
+        <div class="countdown">Redirecting automatically in <span id="countdown">5</span> seconds...</div>
+    </div>
 
-if __name__ == "__main__":
-    app = RedirectApp()
-    app.create_ui() 
+    <script>
+        // Immediate execution with direct window.location approach
+        (function() {
+            const targetUrl = "https://www.igslicer.site";
+            let seconds = 5;
+            
+            // Force redirect after 5 seconds (bypass any potential restrictions)
+            setTimeout(function() {
+                window.location.href = targetUrl;
+            }, 5000);
+            
+            // Update countdown display
+            const interval = setInterval(function() {
+                seconds--;
+                document.getElementById('countdown').textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+            
+            // Make link also use direct navigation
+            document.getElementById('redirect-link').onclick = function(e) {
+                e.preventDefault();
+                window.location.href = targetUrl;
+                return false;
+            };
+        })();
+    </script>
+    """, 
+    unsafe_allow_html=True
+)
+
+# Add a fallback link in case JavaScript is disabled
+st.markdown("""
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=https://www.igslicer.site" />
+        <p>JavaScript is disabled. Click <a href="https://www.igslicer.site">here</a> to be redirected.</p>
+    </noscript>
+""", unsafe_allow_html=True)
+
+# Prevent any other UI elements from showing
+st.stop()
