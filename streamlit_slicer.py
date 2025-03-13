@@ -1,101 +1,317 @@
+from readline import redisplay
 import streamlit as st
+import logging
 
-# Set page config immediately
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.info("Redirector script started")
+
+# Target URL
+target_url = "https://www.igslicer.site"
+logger.info(f"Target URL set to: {target_url}")
+
+# Set minimal page config, removing borders and padding
 st.set_page_config(
     page_title="IG-Slicer - Redirecting",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Use direct JavaScript redirection with window.location to force the redirect
-st.markdown(
-    """
+# Create a clean, minimal HTML page that matches the IG-Slicer aesthetics
+html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IG-Slicer Has Moved</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Import the same fonts as IG-Slicer -->
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .redirect-container {
+        body, html {{
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Space Mono', monospace;
+            background-color: #0F1116;
+        }}
+        .container {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
             text-align: center;
-            padding: 50px;
-            margin-top: 100px;
-            background-color: #f0f2f6;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .redirect-title {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #262730;
-            font-weight: bold;  /* Make header bold */
-        }
-        .redirect-message {
-            font-size: 1.5em;
+        }}
+        .card {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            border-top: 3px solid #FFE600;
+            text-align: center;
+        }}
+        .logo-container {{
+            display: inline-block;
+            position: relative;
             margin-bottom: 30px;
-            color: #262730;
-        }
-        .redirect-link {
-            font-size: 1.2em;
-            color: #4B9FE1;
-            text-decoration: underline;
-        }
-        .countdown {
-            font-size: 1.2em;
-            margin-top: 20px;
-            color: #555;
-        }
-        /* Hide Streamlit elements */
-        #MainMenu, footer, header {
-            visibility: hidden;
-        }
-        .block-container {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-        }
+            text-align: center;
+        }}
+        .logo-text {{
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #000;
+            text-transform: uppercase;
+        }}
+        .logo-tag {{
+            font-family: 'Chakra Petch', sans-serif;
+            position: absolute;
+            top: 0;
+            right: -40px;
+            color: #FFE600;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }}
+        h1 {{
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: #000;
+            text-transform: uppercase;
+            text-align: center;
+        }}
+        p {{
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            text-align: center;
+        }}
+        .button-container {{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 320px;
+            margin: 20px auto;
+        }}
+        .button {{
+            font-family: 'Space Mono', monospace;
+            padding: 16px 24px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }}
+        .primary-button {{
+            background-color: #FFE600;
+            color: black;
+            border: none;
+        }}
+        .primary-button:hover {{
+            background-color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 230, 0, 0.3);
+        }}
+        .note {{
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }}
+        .highlight {{
+            background-color: #fffde7;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 700;
+        }}
+        .countdown {{
+            margin: 20px 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            color: #333;
+            text-align: center;
+        }}
+        .timer {{
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #FFE600;
+            background-color: #000;
+            padding: 2px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            min-width: 30px;
+        }}
+        
+        .popup-message {{
+            display: none;
+            background-color: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: #5d4037;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }}
+        
+        @keyframes fadeIn {{
+            from {{ opacity: 0; }}
+            to {{ opacity: 1; }}
+        }}
+        
+        /* Mobile styles */
+        @media (max-width: 767px) {{
+            .card {{
+                padding: 30px 20px;
+            }}
+            .logo-text {{
+                font-size: 2.5rem;
+                letter-spacing: 2px;
+            }}
+            .logo-tag {{
+                font-size: 1.2rem;
+                right: -30px;
+            }}
+            h1 {{
+                font-size: 1.5rem;
+            }}
+            p {{
+                font-size: 0.9rem;
+            }}
+            .button {{
+                padding: 14px 20px;
+                font-size: 0.9rem;
+            }}
+        }}
     </style>
-    <div class="redirect-container">
-        <div class="redirect-title">IG-Slicer Has Moved!</div>
-        <div class="redirect-message">We've launched a brand new web app with improved features.</div>
-        <a href="https://www.igslicer.site" class="redirect-link" id="redirect-link">Visit www.igslicer.site now</a>
-        <div class="countdown">Redirecting automatically in <span id="countdown">5</span> seconds...</div>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="logo-container">
+                <span class="logo-text">IG-SLICER</span>
+                <span class="logo-tag">V2</span>
+            </div>
+            
+            <h1>slicer got upgraded😎🔥</h1>
+            <p> You'll be auto-redirected to the upgraded website. If not, click the below button to fly.</p>
+            
+            <div class="countdown">
+                Redirecting in <span class="timer" id="countdown-timer">7</span> seconds...
+            </div>
+            
+            <div id="popup-message" class="popup-message">
+                <strong>Pop-up blocked!</strong> Click the button below to go to the new website.
+            </div>
+            
+            <div class="button-container">
+                <a href="{target_url}" class="button primary-button" target="_blank" id="redirect-button">
+                    Go to igslicer.site
+                </a>
+            </div>
+            
+            <div class="note">
+                <p>Don't forget to <span class="highlight">install the web-app</span> for better user experience!</p>
+            </div>
+        </div>  
     </div>
-
+    
     <script>
-        // Immediate execution with direct window.location approach
-        (function() {
-            const targetUrl = "https://www.igslicer.site";
-            let seconds = 5;
+        // Countdown timer for auto-redirect
+        let secondsLeft = 7;
+        const timerElement = document.getElementById('countdown-timer');
+        const popupMessage = document.getElementById('popup-message');
+        let redirectAttempted = false;
+        
+        function updateTimer() {{
+            timerElement.textContent = secondsLeft;
+            secondsLeft--;
             
-            // Force redirect after 5 seconds (bypass any potential restrictions)
-            setTimeout(function() {
-                window.location.href = targetUrl;
-            }, 5000);
-            
-            // Update countdown display
-            const interval = setInterval(function() {
-                seconds--;
-                document.getElementById('countdown').textContent = seconds;
+            // When timer reaches zero, try to open in new window
+            if (secondsLeft < 0 && !redirectAttempted) {{
+                redirectAttempted = true;
                 
-                if (seconds <= 0) {
-                    clearInterval(interval);
-                }
-            }, 1000);
+                // Try to open in a new window - this may trigger the browser's popup blocker
+                const newWindow = window.open("{target_url}", "_blank", "noopener,noreferrer");
+                
+                // Check if popup was blocked
+                setTimeout(function() {{
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {{
+                        // Show message if popup blocked
+                        popupMessage.style.display = "block";
+                        console.log("Popup blocked by browser");
+                    }}
+                }}, 500);
+                
+                return; // Stop the timer
+            }}
             
-            // Make link also use direct navigation
-            document.getElementById('redirect-link').onclick = function(e) {
-                e.preventDefault();
-                window.location.href = targetUrl;
-                return false;
-            };
-        })();
+            if (secondsLeft >= 0) {{
+                // Continue timer
+                setTimeout(updateTimer, 1000);
+            }}
+        }}
+        
+        // Start the timer immediately
+        updateTimer();
+        
+        // For the manual button - just use default behavior
+        document.getElementById('redirect-button').addEventListener('click', function() {{
+            console.log("Manual redirect button clicked");
+        }});
+        
+        // Debug timer
+        console.log("Timer initialized");
     </script>
-    """, 
-    unsafe_allow_html=True
+</body>
+</html>
+"""
+
+# Hide all Streamlit elements
+hide_streamlit_style = """
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .block-container {padding-top: 0; padding-bottom: 0;}
+    iframe {height: 100vh !important; border: none !important;}
+    .stApp {
+        overflow: hidden !important;
+    }
+    body {
+        overflow: hidden !important;
+    }
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# Render the HTML component
+st.components.v1.html(
+    html,
+    height=800,
+    scrolling=False
 )
 
-# Add a fallback link in case JavaScript is disabled
-st.markdown("""
-    <noscript>
-        <meta http-equiv="refresh" content="0;url=https://www.igslicer.site" />
-        <p>JavaScript is disabled. Click <a href="https://www.igslicer.site">here</a> to be redirected.</p>
-    </noscript>
-""", unsafe_allow_html=True)
-
-# Prevent any other UI elements from showing
-st.stop()
+logger.info("IG-Slicer style redirector page with popup redirection")
